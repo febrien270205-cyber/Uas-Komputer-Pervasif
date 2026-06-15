@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Exam System</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#0f172a;
+    color:#e2e8f0;
+    font-family:'Segoe UI',sans-serif;
+    min-height:100vh;
+    padding:30px;
+}
+
+.background{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:
+    radial-gradient(circle at top left,#1e3a8a 0%,transparent 40%),
+    radial-gradient(circle at bottom right,#7c3aed 0%,transparent 40%);
+    z-index:-1;
+}
+
+h1,h2,h3{
+    color:#f8fafc;
+    margin-bottom:15px;
+}
+
+#startPage,
+#examPage,
+#resultPage{
+    max-width:900px;
+    margin:auto;
+    background:#111827;
+    padding:30px;
+    border-radius:16px;
+    box-shadow:0 0 30px rgba(0,0,0,0.5);
+}
+
+.card{
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+input[type="text"]{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#334155;
+    color:white;
+    margin-bottom:15px;
+}
+
+input[type="radio"]{
+    accent-color:#3b82f6;
+    margin-right:8px;
+}
+
+label{
+    display:block;
+    padding:8px;
+    border-radius:8px;
+    margin:5px 0;
+}
+
+label:hover{
+    background:#334155;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 24px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+.warning{
+    color:#f87171;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.afk{
+    color:#fbbf24;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+#timer{
+    color:#22c55e;
+    font-size:24px;
+    font-weight:bold;
+}
+
+li{
+    margin-bottom:8px;
+}
+
+#warningPopup{
+    display:none;
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:#dc2626;
+    color:white;
+    padding:25px;
+    border-radius:12px;
+    font-size:22px;
+    font-weight:bold;
+    text-align:center;
+    box-shadow:0 0 30px rgba(0,0,0,0.6);
+    z-index:9999;
+    animation:popupAnim .3s ease;
+}
+
+@keyframes popupAnim{
+    from{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(.7);
+    }
+    to{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="background"></div>
+
+<div id="startPage">
+
+    <h1>📝 Smart Context-Aware Exam</h1>
+
+    <input type="text" id="nama" placeholder="Masukkan Nama">
+
+    <input type="text" id="nim" placeholder="Masukkan NIM">
+
+    <button onclick="mulaiUjian()">
+        Mulai Ujian
+    </button>
+
+</div>
+
+<div id="examPage" style="display:none">
+
+    <h2>Kuis Kecerdasan Ala Wowok</h2>
+
+    <p>
+        Sisa Waktu :
+        <span id="timer">180</span> detik
+    </p>
+
+    <br>
+
+    <p class="warning">
+        Pelanggaran Pindah Tab :
+        <span id="tabCount">0</span>
+    </p>
+
+    <p class="afk">
+        Status :
+        <span id="afkStatus">Aktif</span>
+    </p>
+
+    <br>
+
+    <div id="questions"></div>
+
+    <button onclick="submitExam()">
+        Selesai Ujian
+    </button>
+
+</div>
+
+<div id="resultPage" style="display:none">
+
+    <h2>Hasil Ujian</h2>
+
+    <p id="score"></p>
+
+    <br>
+
+    <h3>Log Perilaku</h3>
+
+    <ul id="logs"></ul>
+
+</div>
+
+<div id="warningPopup">
+⚠ PERINGATAN!<br>
+Anda berpindah tab.<br>
+Pelanggaran telah dicatat.
+</div>
+
+<script>
+
+const questions = [
+
+{
+question:"Ibukota Indonesia?",
+options:["Jakarta","Bandung","Padang","Medan"],
+answer:"Jakarta"
+},
+
+{
+question:"2 + 2 = ?",
+options:["3","4","5","6"],
+answer:"4"
+},
+
+{
+question:"Planet terbesar?",
+options:["Mars","Venus","Jupiter","Bumi"],
+answer:"Jupiter"
+},
+
+{
+question:"Bahasa utama AI?",
+options:["Python","HTML","CSS","PHP"],
+answer:"Python"
+},
+
+{
+question:"10 x 5 = ?",
+options:["45","50","55","60"],
+answer:"50"
+}
+
+];
+
+let examTime = 120;
+let timerInterval;
+let tabViolation = 0;
+let logs = [];
+let lastActivity = Date.now();
+let afkLogged = false;
+
+function showWarning(){
+
+    const popup =
+    document.getElementById("warningPopup");
+
+    popup.style.display = "block";
+
+    setTimeout(()=>{
+        popup.style.display = "none";
+    },3000);
+}
+
+function mulaiUjian(){
+
+    let nama =
+    document.getElementById("nama").value;
+
+    let nim =
+    document.getElementById("nim").value;
+
+    if(nama === "" || nim === ""){
+        alert("Isi Nama dan NIM");
+        return;
+    }
+
+    document.getElementById("startPage").style.display =
+    "none";
+
+    document.getElementById("examPage").style.display =
+    "block";
+
+    renderQuestions();
+
+    startTimer();
+}
+
+function renderQuestions(){
+
+    let html = "";
+
+    questions.forEach((q,index)=>{
+
+        html += `
+        <div class="card">
+            <h3>${index+1}. ${q.question}</h3>
+
+            ${q.options.map(opt=>`
+            <label>
+                <input
+                type="radio"
+                name="q${index}"
+                value="${opt}">
+                ${opt}
+            </label>
+            `).join("")}
+
+        </div>
+        `;
+    });
+
+    document.getElementById("questions").innerHTML =
+    html;
+}
+
+function startTimer(){
+
+    timerInterval = setInterval(()=>{
+
+        examTime--;
+
+        document.getElementById("timer").innerText =
+        examTime;
+
+        if(examTime <= 0){
+            submitExam();
+        }
+
+    },1000);
+}
+
+function submitExam(){
+
+    clearInterval(timerInterval);
+
+    let score = 0;
+
+    questions.forEach((q,index)=>{
+
+        let selected =
+        document.querySelector(
+        `input[name="q${index}"]:checked`
+        );
+
+        if(selected &&
+           selected.value === q.answer){
+
+            score += 20;
+        }
+
+    });
+
+    document.getElementById("examPage").style.display =
+    "none";
+
+    document.getElementById("resultPage").style.display =
+    "block";
+
+    document.getElementById("score").innerHTML =
+    `<h3>Nilai Anda : ${score}</h3>`;
+
+    let logHTML = "";
+
+    if(logs.length === 0){
+        logHTML =
+        "<li>Tidak ada pelanggaran</li>";
+    }
+
+    logs.forEach(item=>{
+        logHTML += `<li>${item}</li>`;
+    });
+
+    document.getElementById("logs").innerHTML =
+    logHTML;
+}
+
+document.addEventListener(
+"visibilitychange",
+function(){
+
+    if(document.hidden){
+
+        tabViolation++;
+
+        showWarning();
+
+        document.getElementById("tabCount").innerText =
+        tabViolation;
+
+        logs.push(
+        "Pindah tab sebanyak "
+        + tabViolation +
+        " kali"
+        );
+
+        if(tabViolation >= 3){
+
+            logs.push(
+            "Ujian otomatis dihentikan karena terlalu sering berpindah tab"
+            );
+
+            alert(
+            "Ujian dihentikan! Terlalu sering berpindah tab."
+            );
+
+            submitExam();
+        }
+    }
+}
+);
+
+function resetActivity(){
+
+    lastActivity = Date.now();
+
+    document.getElementById("afkStatus").innerText =
+    "Aktif";
+
+    afkLogged = false;
+}
+
+document.addEventListener(
+"mousemove",
+resetActivity
+);
+
+document.addEventListener(
+"keydown",
+resetActivity
+);
+
+document.addEventListener(
+"click",
+resetActivity
+);
+
+setInterval(()=>{
+
+    let idleTime =
+    (Date.now() - lastActivity)/1000;
+
+    if(idleTime > 15){
+
+        document.getElementById("afkStatus").innerText =
+        "AFK";
+
+        if(!afkLogged){
+
+            logs.push(
+            "User AFK lebih dari 15 detik"
+            );
+
+            afkLogged = true;
+        }
+    }
+
+},1000);
+
+</script>
+
+</body>
+</html>
