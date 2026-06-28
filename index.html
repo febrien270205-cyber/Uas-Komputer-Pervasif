@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Context-Aware Online Exam</title>
+
+    <link rel="stylesheet"
+          href="style.css">
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- Screenshot -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="background"></div>
+
+<!-- ================= LOGIN ================= -->
+
+<section id="loginPage">
+
+<div class="login-box">
+
+<h1>
+<i class="fa-solid fa-user-lock"></i>
+SMART EXAM
+</h1>
+
+<p>
+Silahkan Login Terlebih Dahulu
+</p>
+
+<input
+type="text"
+id="nama"
+placeholder="Nama Mahasiswa">
+
+<input
+type="text"
+id="nim"
+placeholder="NIM">
+
+<input
+type="password"
+id="password"
+placeholder="Password">
+
+<button
+id="loginBtn">
+
+LOGIN
+
+</button>
+
+<p id="loginError"></p>
+
+</div>
+
+</section>
+
+<!-- ================= DASHBOARD ================= -->
+
+<section
+id="examPage">
+
+<div class="header">
+
+<h2>
+
+Smart Context-Aware Online Exam
+
+</h2>
+
+<div class="userInfo">
+
+<span id="showNama"></span>
+
+<span id="showNim"></span>
+
+</div>
+
+</div>
+
+<!-- TIMER -->
+
+<div class="timerBox">
+
+<div class="progress">
+
+<div id="progressBar"></div>
+
+</div>
+
+<div class="timer">
+
+<i class="fa-solid fa-clock"></i>
+
+<span id="timer">
+
+30:00
+
+</span>
+
+</div>
+
+</div>
+
+<!-- STATUS -->
+
+<div class="statusBox">
+
+<div>
+
+Pelanggaran :
+
+<span id="warningCount">
+
+0
+
+</span>
+
+</div>
+
+<div>
+
+AFK :
+
+<span id="afkStatus">
+
+Aktif
+
+</span>
+
+</div>
+
+<div>
+
+Status :
+
+<span id="examStatus">
+
+Sedang Ujian
+
+</span>
+
+</div>
+
+</div>
+
+<!-- WARNING -->
+
+<div id="warningPopup">
+
+<i class="fa-solid fa-triangle-exclamation"></i>
+
+<h2>
+
+PERINGATAN
+
+</h2>
+
+<p>
+
+Anda meninggalkan halaman ujian.
+
+Pelanggaran telah dicatat.
+
+</p>
+
+</div>
+
+<!-- SOAL -->
+
+<div id="questionContainer">
+
+</div>
+
+<div class="btnArea">
+
+<button id="finishBtn">
+
+<i class="fa-solid fa-check"></i>
+
+Selesai Ujian
+
+</button>
+
+</div>
+
+</section>
+
+<!-- ================= RESULT ================= -->
+
+<section
+id="resultPage">
+
+<div class="resultCard">
+
+<h1>
+
+HASIL UJIAN
+
+</h1>
+
+<div class="identity">
+
+<p>
+
+Nama :
+
+<b id="resultNama"></b>
+
+</p>
+
+<p>
+
+NIM :
+
+<b id="resultNim"></b>
+
+</p>
+
+<p>
+
+Tanggal :
+
+<b id="tanggal"></b>
+
+</p>
+
+<p>
+
+Jam :
+
+<b id="jam"></b>
+
+</p>
+
+</div>
+
+<div class="nilai">
+
+<h2>
+
+Nilai
+
+</h2>
+
+<h1 id="score">
+
+0
+
+</h1>
+
+</div>
+
+<div class="activity">
+
+<h2>
+
+Log Aktivitas
+
+</h2>
+
+<ul id="activityLog">
+
+</ul>
+
+</div>
+
+<div class="resultButton">
+
+<button id="downloadLog">
+
+Download Log
+
+</button>
+
+<button id="downloadImage">
+
+Screenshot Hasil
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
