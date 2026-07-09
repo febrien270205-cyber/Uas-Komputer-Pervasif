@@ -31,6 +31,8 @@ Langkah 1: Menyiapkan Google Sheets
    contoh:
    |   A    |  B  |    C     |   D   |
    |  Nama  | NIM | Password | Skor  |
+3.https://docs.google.com/spreadsheets/d/1ebOvWgi2YFekpwDZ08nYDtYDB66dEBggdjZO5arSFG8/edit?usp=sharing
+  link database Mahasiswa jika ingin menambahkan data mahasiswa lain 
 
 Langkah 2: Menghubungkan Web dengan Google Apps Script
 1. Di dalam Google Sheets, klik menu "Ekstensi" (Extensions) > "Apps Script".
